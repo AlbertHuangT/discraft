@@ -35,8 +35,8 @@ public class ConfigScreen extends Screen {
 
         int centerX = this.width / 2;
 
-        // 授权 Discord 按钮（Y=40）
-        addDrawableChild(new ButtonWidget(centerX - 100, 40, 200, 20,
+        // 授权 Discord 按钮（Y=36）
+        addDrawableChild(new ButtonWidget(centerX - 100, 36, 200, 20,
                 Text.translatable("gui.discraft.config.authorize"), btn -> {
             btn.active = false;
             DisCraft.BRIDGE.startIpcAuth(client);
@@ -48,18 +48,18 @@ public class ConfigScreen extends Screen {
             t.start();
         }));
 
-        // 当前上下文的快捷编辑按钮（Y=64）
+        // 当前上下文的快捷编辑按钮（Y=60）
         String ctx = DisCraft.BRIDGE.getCurrentContext();
         Text ctxLabel = (ctx != null)
                 ? Text.translatable("gui.discraft.config.edit_current").append(shortenContext(ctx))
                 : Text.translatable("gui.discraft.config.not_in_game");
-        addDrawableChild(new ButtonWidget(centerX - 100, 64, 200, 20,
+        addDrawableChild(new ButtonWidget(centerX - 100, 60, 200, 20,
                 ctxLabel, btn -> {
             if (ctx != null) client.setScreen(new MappingEditScreen(this, ctx));
         }));
 
-        // 映射列表翻页按钮（Y=92）
-        addDrawableChild(new ButtonWidget(centerX - 110, 92, 20, 20,
+        // 映射列表翻页按钮（Y=108，在标题下方）
+        addDrawableChild(new ButtonWidget(centerX - 110, 108, 20, 20,
                 Text.literal("◀"), btn -> {
             if (scrollOffset > 0) {
                 scrollOffset--;
@@ -67,7 +67,7 @@ public class ConfigScreen extends Screen {
             }
         }));
 
-        addDrawableChild(new ButtonWidget(centerX + 90, 92, 20, 20,
+        addDrawableChild(new ButtonWidget(centerX + 90, 108, 20, 20,
                 Text.literal("▶"), btn -> {
             int maxOffset = Math.max(0, mappingEntries.size() - ENTRIES_PER_PAGE);
             if (scrollOffset < maxOffset) {
@@ -76,8 +76,8 @@ public class ConfigScreen extends Screen {
             }
         }));
 
-        // 映射条目按钮（Y=122+）
-        int startY = 122;
+        // 映射条目按钮（Y=132+）
+        int startY = 132;
         int rowHeight = 24;
         for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
             int entryIndex = scrollOffset + i;
@@ -108,16 +108,16 @@ public class ConfigScreen extends Screen {
         // 标题
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 14, 0xFFFFFF);
 
-        // 语音连接状态（Y=88）
+        // 语音连接状态（Y=84，授权/编辑按钮下方）
         Text statusText = DisCraft.BRIDGE.isVoiceConnected()
                 ? Text.translatable("gui.discraft.config.voice_connected")
                 : Text.translatable("gui.discraft.config.voice_disconnected");
         drawTextWithShadow(matrices, textRenderer, statusText,
-                this.width / 2 - 150, 88, 0xFFFFFF);
+                this.width / 2 - 150, 84, 0xFFFFFF);
 
-        // 映射列表标题（Y=108）
+        // 映射列表标题（Y=96，翻页按钮上方）
         drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.config.mappings_title"),
-                this.width / 2 - 150, 108, 0xFFFFFF);
+                this.width / 2 - 150, 96, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, delta);
     }

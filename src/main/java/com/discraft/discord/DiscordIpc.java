@@ -322,7 +322,8 @@ public class DiscordIpc {
             String body = "client_id=" + URLEncoder.encode(CLIENT_ID, StandardCharsets.UTF_8)
                     + "&client_secret=" + URLEncoder.encode(CLIENT_SECRET, StandardCharsets.UTF_8)
                     + "&grant_type=authorization_code"
-                    + "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8);
+                    + "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8)
+                    + "&redirect_uri=" + URLEncoder.encode("http://localhost", StandardCharsets.UTF_8);
 
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(URI.create("https://discord.com/api/oauth2/token"))

@@ -21,12 +21,6 @@ public class DisCraftConfig {
 
     // ---- 字段 ----
 
-    /** Discord 应用 Client ID（在 Discord Developer Portal 获取） */
-    public String discordClientId = "";
-
-    /** Discord 应用 Client Secret（在 Discord Developer Portal 获取） */
-    public String discordClientSecret = "";
-
     /** Discord OAuth2 access_token（通过 IPC 授权流程获取，自动保存） */
     public String discordAccessToken = "";
 
@@ -47,8 +41,6 @@ public class DisCraftConfig {
                 if (cfg != null) {
                     if (cfg.mappings == null) cfg.mappings = new HashMap<>();
                     if (cfg.discordAccessToken == null) cfg.discordAccessToken = "";
-                    if (cfg.discordClientId == null) cfg.discordClientId = "";
-                    if (cfg.discordClientSecret == null) cfg.discordClientSecret = "";
                     return cfg;
                 }
             }

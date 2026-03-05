@@ -4,7 +4,6 @@ import com.discraft.DisCraft;
 import com.discraft.config.WorldMapping;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -19,10 +18,6 @@ import java.util.Map;
 public class ConfigScreen extends Screen {
 
     private final Screen parent;
-
-    // 凭据输入框
-    private TextFieldWidget clientIdField;
-    private TextFieldWidget clientSecretField;
 
     // 映射列表分页
     private int scrollOffset = 0;
@@ -39,36 +34,9 @@ public class ConfigScreen extends Screen {
         refreshMappingEntries();
 
         int centerX = this.width / 2;
-        int fieldWidth = 220;
-        int gap = 4;
-        // 两个输入框并排，总宽 = fieldWidth*2 + gap
-        int totalFieldWidth = fieldWidth * 2 + gap;
-        int leftFieldX = centerX - totalFieldWidth / 2;
-        int rightFieldX = leftFieldX + fieldWidth + gap;
 
-        // Client ID 输入框
-        clientIdField = new TextFieldWidget(textRenderer, leftFieldX, 30, fieldWidth, 18,
-                Text.literal("Client ID"));
-        clientIdField.setMaxLength(64);
-        clientIdField.setText(DisCraft.CONFIG.discordClientId);
-        addDrawableChild(clientIdField);
-
-        // Client Secret 输入框
-        clientSecretField = new TextFieldWidget(textRenderer, rightFieldX, 30, fieldWidth, 18,
-                Text.literal("Client Secret"));
-        clientSecretField.setMaxLength(64);
-        clientSecretField.setText(DisCraft.CONFIG.discordClientSecret);
-        addDrawableChild(clientSecretField);
-
-        // 保存应用设置 + 授权 Discord 按钮（Y=54）
-        addDrawableChild(new ButtonWidget(centerX - 210, 54, 100, 20,
-                Text.literal("保存应用设置"), btn -> {
-            DisCraft.CONFIG.discordClientId = clientIdField.getText().strip();
-            DisCraft.CONFIG.discordClientSecret = clientSecretField.getText().strip();
-            DisCraft.CONFIG.save();
-        }));
-
-        addDrawableChild(new ButtonWidget(centerX - 100, 54, 200, 20,
+        // 授权 Discord 按钮（Y=40）
+        addDrawableChild(new ButtonWidget(centerX - 100, 40, 200, 20,
                 Text.literal("授权 Discord（语音功能必须）"), btn -> {
             btn.active = false;
             DisCraft.BRIDGE.startIpcAuth(client);
@@ -80,18 +48,18 @@ public class ConfigScreen extends Screen {
             t.start();
         }));
 
-        // 当前上下文的快捷编辑按钮（Y=78）
+        // 当前上下文的快捷编辑按钮（Y=64）
         String ctx = DisCraft.BRIDGE.getCurrentContext();
         String ctxLabel = (ctx != null)
                 ? "编辑当前：" + shortenContext(ctx)
                 : "未在游戏中";
-        addDrawableChild(new ButtonWidget(centerX - 100, 78, 200, 20,
+        addDrawableChild(new ButtonWidget(centerX - 100, 64, 200, 20,
                 Text.literal(ctxLabel), btn -> {
             if (ctx != null) client.setScreen(new MappingEditScreen(this, ctx));
         }));
 
-        // 映射列表翻页按钮（Y=104）
-        addDrawableChild(new ButtonWidget(centerX - 110, 104, 20, 20,
+        // 映射列表翻页按钮（Y=92）
+        addDrawableChild(new ButtonWidget(centerX - 110, 92, 20, 20,
                 Text.literal("◀"), btn -> {
             if (scrollOffset > 0) {
                 scrollOffset--;
@@ -99,7 +67,7 @@ public class ConfigScreen extends Screen {
             }
         }));
 
-        addDrawableChild(new ButtonWidget(centerX + 90, 104, 20, 20,
+        addDrawableChild(new ButtonWidget(centerX + 90, 92, 20, 20,
                 Text.literal("▶"), btn -> {
             int maxOffset = Math.max(0, mappingEntries.size() - ENTRIES_PER_PAGE);
             if (scrollOffset < maxOffset) {
@@ -108,8 +76,8 @@ public class ConfigScreen extends Screen {
             }
         }));
 
-        // 映射条目按钮（Y=134+）
-        int startY = 134;
+        // 映射条目按钮（Y=122+）
+        int startY = 122;
         int rowHeight = 24;
         for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
             int entryIndex = scrollOffset + i;
@@ -140,21 +108,15 @@ public class ConfigScreen extends Screen {
         // 标题
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 14, 0xFFFFFF);
 
-        // 凭据输入框标签
-        drawTextWithShadow(matrices, textRenderer, Text.literal("§7Client ID"),
-                this.width / 2 - (220 * 2 + 4) / 2, 20, 0xFFFFFF);
-        drawTextWithShadow(matrices, textRenderer, Text.literal("§7Client Secret"),
-                this.width / 2 - (220 * 2 + 4) / 2 + 220 + 4, 20, 0xFFFFFF);
-
-        // 语音连接状态
+        // 语音连接状态（Y=88）
         String statusText = DisCraft.BRIDGE.isVoiceConnected()
                 ? "§a● 语音已连接" : "§7○ Discord 未运行或未授权";
         drawTextWithShadow(matrices, textRenderer, Text.literal(statusText),
-                this.width / 2 - 150, 100, 0xFFFFFF);
+                this.width / 2 - 150, 88, 0xFFFFFF);
 
-        // 映射列表标题
+        // 映射列表标题（Y=108）
         drawTextWithShadow(matrices, textRenderer, Text.literal("§e所有频道映射："),
-                this.width / 2 - 150, 122, 0xFFFFFF);
+                this.width / 2 - 150, 108, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, delta);
     }

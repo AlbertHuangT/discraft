@@ -44,6 +44,11 @@ public class DiscordIpc {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("discraft");
 
+    // DisCraft 共享应用凭据（编译时常量）
+    // 前往 https://discord.com/developers/applications 注册应用后填入
+    public static final String CLIENT_ID = "1478939568475738314";
+    private static final String CLIENT_SECRET = "UpDyery6xI0uuglPhz5isFABwu27qHeq";
+
     private static final int OP_HANDSHAKE = 0;
     private static final int OP_FRAME = 1;
     private static final int OP_CLOSE = 2;
@@ -64,11 +69,6 @@ public class DiscordIpc {
      */
     public synchronized boolean ensureConnected() {
         if (authenticated) return true;
-        // 检查凭据是否已配置
-        if (DisCraft.CONFIG.discordClientId.isBlank() || DisCraft.CONFIG.discordClientSecret.isBlank()) {
-            LOGGER.warn("[DisCraft] Discord 应用凭据未配置，请在设置中填写 Client ID 和 Client Secret");
-            return false;
-        }
         if (!connected) {
             if (!doConnect()) {
                 LOGGER.info("[DisCraft] Discord 未运行，IPC 连接失败");
@@ -105,11 +105,6 @@ public class DiscordIpc {
      * 必须在后台线程调用，会阻塞等待用户在 Discord 中点击"授权"。
      */
     public synchronized void startAuth(MinecraftClient mc) {
-        // 检查凭据是否已配置
-        if (DisCraft.CONFIG.discordClientId.isBlank() || DisCraft.CONFIG.discordClientSecret.isBlank()) {
-            showInfo(mc, "§c[DisCraft] 请先在设置中填写 Discord 应用 Client ID 和 Client Secret");
-            return;
-        }
         if (!connected) {
             if (!doConnect() || !doHandshake()) {
                 showInfo(mc, "§7[DisCraft] Discord 未运行，无法进行授权");
@@ -122,7 +117,7 @@ public class DiscordIpc {
 
             // 发送 AUTHORIZE 命令，Discord 将弹出授权对话框
             JsonObject args = new JsonObject();
-            args.addProperty("client_id", DisCraft.CONFIG.discordClientId);
+            args.addProperty("client_id", CLIENT_ID);
             JsonArray scopes = new JsonArray();
             scopes.add("rpc");
             scopes.add("rpc.voice.write");
@@ -249,7 +244,7 @@ public class DiscordIpc {
         try {
             JsonObject hs = new JsonObject();
             hs.addProperty("v", 1);
-            hs.addProperty("client_id", DisCraft.CONFIG.discordClientId);
+            hs.addProperty("client_id", CLIENT_ID);
             send(OP_HANDSHAKE, hs.toString());
 
             // 读取 READY 响应
@@ -324,8 +319,8 @@ public class DiscordIpc {
 
     private String exchangeCodeForToken(String code) {
         try {
-            String body = "client_id=" + URLEncoder.encode(DisCraft.CONFIG.discordClientId, StandardCharsets.UTF_8)
-                    + "&client_secret=" + URLEncoder.encode(DisCraft.CONFIG.discordClientSecret, StandardCharsets.UTF_8)
+            String body = "client_id=" + URLEncoder.encode(CLIENT_ID, StandardCharsets.UTF_8)
+                    + "&client_secret=" + URLEncoder.encode(CLIENT_SECRET, StandardCharsets.UTF_8)
                     + "&grant_type=authorization_code"
                     + "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8);
 

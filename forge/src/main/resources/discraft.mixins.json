@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.discraft.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "discraft.refmap.json",
+  "client": [
+    "ChatScreenMixin",
+    "AdvancementToastMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -112,12 +112,11 @@ public class ConfigScreen extends Screen {
         Text statusText = DisCraft.BRIDGE.isVoiceConnected()
                 ? Text.translatable("gui.discraft.config.voice_connected")
                 : Text.translatable("gui.discraft.config.voice_disconnected");
-        drawTextWithShadow(matrices, textRenderer, statusText,
-                this.width / 2 - 150, 84, 0xFFFFFF);
+        drawCenteredText(matrices, textRenderer, statusText, this.width / 2, 84, 0xFFFFFF);
 
         // 映射列表标题（Y=96，翻页按钮上方）
-        drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.config.mappings_title"),
-                this.width / 2 - 150, 96, 0xFFFFFF);
+        drawCenteredText(matrices, textRenderer, Text.translatable("gui.discraft.config.mappings_title"),
+                this.width / 2, 96, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, delta);
     }

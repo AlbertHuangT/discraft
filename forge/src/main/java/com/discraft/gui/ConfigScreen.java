@@ -101,10 +101,10 @@ public class ConfigScreen extends Screen {
         Component statusText = DisCraft.BRIDGE.isVoiceConnected()
                 ? Component.translatable("gui.discraft.config.voice_connected")
                 : Component.translatable("gui.discraft.config.voice_disconnected");
-        this.font.drawShadow(poseStack, statusText, (float)(this.width / 2 - 150), 88, 0xFFFFFF);
+        drawCenteredString(poseStack, this.font, statusText, this.width / 2, 88, 0xFFFFFF);
 
-        this.font.drawShadow(poseStack, Component.translatable("gui.discraft.config.mappings_title"),
-                (float)(this.width / 2 - 150), 108, 0xFFFFFF);
+        drawCenteredString(poseStack, this.font, Component.translatable("gui.discraft.config.mappings_title"),
+                this.width / 2, 108, 0xFFFFFF);
 
         super.render(poseStack, mouseX, mouseY, delta);
     }

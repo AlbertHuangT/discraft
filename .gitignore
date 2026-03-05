@@ -1,9 +1,18 @@
+# Gradle
 .gradle/
 build/
 out/
 *.class
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+!forge/gradle/wrapper/gradle-wrapper.jar
+
+# Forge dev run directory
+run/
+forge/run/
+
+# macOS
+.DS_Store
 
 # IDE
 .idea/

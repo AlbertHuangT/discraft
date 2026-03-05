@@ -12,6 +12,9 @@
   "entrypoints": {
     "client": [
       "com.discraft.DisCraft"
+    ],
+    "modmenu": [
+      "com.discraft.ModMenuIntegration"
     ]
   },
   "mixins": [

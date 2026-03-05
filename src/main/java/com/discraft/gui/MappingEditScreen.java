@@ -38,17 +38,19 @@ public class MappingEditScreen extends Screen {
     @Override
     protected void init() {
         int centerX = this.width / 2;
-        int startY = 40;
+        int startY = 46;
         int fieldWidth = 280;
         int fieldHeight = 20;
-        int gap = 28;
+        int gap = 32;
 
         // 显示名
         displayNameField = new TextFieldWidget(textRenderer, centerX - fieldWidth / 2, startY, fieldWidth, fieldHeight,
                 Text.translatable("gui.discraft.mapping.label.name"));
         displayNameField.setMaxLength(64);
         displayNameField.setText(mapping.displayName);
-        displayNameField.setSuggestion(Text.translatable("gui.discraft.mapping.hint.name").getString());
+        String hintName = Text.translatable("gui.discraft.mapping.hint.name").getString();
+        displayNameField.setSuggestion(mapping.displayName.isEmpty() ? hintName : "");
+        displayNameField.setChangedListener(t -> displayNameField.setSuggestion(t.isEmpty() ? hintName : ""));
         addDrawableChild(displayNameField);
 
         // Webhook URL
@@ -57,7 +59,9 @@ public class MappingEditScreen extends Screen {
                 Text.translatable("gui.discraft.mapping.label.webhook"));
         webhookUrlField.setMaxLength(256);
         webhookUrlField.setText(mapping.webhookUrl);
-        webhookUrlField.setSuggestion(Text.translatable("gui.discraft.mapping.hint.webhook").getString());
+        String hintWebhook = Text.translatable("gui.discraft.mapping.hint.webhook").getString();
+        webhookUrlField.setSuggestion(mapping.webhookUrl.isEmpty() ? hintWebhook : "");
+        webhookUrlField.setChangedListener(t -> webhookUrlField.setSuggestion(t.isEmpty() ? hintWebhook : ""));
         addDrawableChild(webhookUrlField);
 
         // 语音频道 ID
@@ -66,7 +70,9 @@ public class MappingEditScreen extends Screen {
                 Text.translatable("gui.discraft.mapping.label.voice"));
         voiceChannelIdField.setMaxLength(32);
         voiceChannelIdField.setText(mapping.voiceChannelId);
-        voiceChannelIdField.setSuggestion(Text.translatable("gui.discraft.mapping.hint.voice").getString());
+        String hintVoice = Text.translatable("gui.discraft.mapping.hint.voice").getString();
+        voiceChannelIdField.setSuggestion(mapping.voiceChannelId.isEmpty() ? hintVoice : "");
+        voiceChannelIdField.setChangedListener(t -> voiceChannelIdField.setSuggestion(t.isEmpty() ? hintVoice : ""));
         addDrawableChild(voiceChannelIdField);
 
         // 复选框
@@ -112,8 +118,8 @@ public class MappingEditScreen extends Screen {
 
         int centerX = this.width / 2;
         int fieldWidth = 280;
-        int startY = 40;
-        int gap = 28;
+        int startY = 46;
+        int gap = 32;
         int labelX = centerX - fieldWidth / 2;
 
         drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.mapping.label.name"), labelX, startY - 10, 0xCCCCCC);

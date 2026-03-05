@@ -2,6 +2,7 @@ package com.discraft.discord;
 
 import com.discraft.DisCraft;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -96,8 +97,16 @@ public class DiscordIpc {
             send(OP_FRAME, buildCommand("AUTHORIZE", args).toString());
 
             JsonObject resp = readFrame();
+            LOGGER.info("[DisCraft] AUTHORIZE 响应: {}", resp);
             if (isError(resp)) {
                 showInfo(mc, "§c[DisCraft] 授权被拒绝或失败");
+                return;
+            }
+
+            if (!resp.has("data") || resp.get("data").isJsonNull()
+                    || !resp.getAsJsonObject("data").has("code")) {
+                LOGGER.error("[DisCraft] AUTHORIZE 响应格式异常: {}", resp);
+                showInfo(mc, "§c[DisCraft] Discord 授权响应异常，请检查 Developer Portal 中的 APPLICATION_ID 配置");
                 return;
             }
 
@@ -119,7 +128,7 @@ public class DiscordIpc {
                 showInfo(mc, "§c[DisCraft] Discord 认证失败，请重试");
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("[DisCraft] 授权流程失败", e);
             showInfo(mc, "§c[DisCraft] 授权失败: " + e.getMessage());
         }
@@ -255,7 +264,7 @@ public class DiscordIpc {
 
         byte[] body = readExact(length);
         String json = new String(body, StandardCharsets.UTF_8);
-        LOGGER.debug("[DisCraft] IPC 收到: {}", json);
+        LOGGER.info("[DisCraft] IPC 收到: {}", json);
         return JsonParser.parseString(json).getAsJsonObject();
     }
 
@@ -306,7 +315,9 @@ public class DiscordIpc {
     }
 
     private boolean isError(JsonObject resp) {
-        return resp.has("evt") && "ERROR".equals(resp.get("evt").getAsString());
+        if (!resp.has("evt")) return false;
+        JsonElement evt = resp.get("evt");
+        return !evt.isJsonNull() && "ERROR".equals(evt.getAsString());
     }
 
     private void showInfo(Minecraft mc, String message) {

@@ -35,16 +35,18 @@ public class MappingEditScreen extends Screen {
     @Override
     protected void init() {
         int centerX = this.width / 2;
-        int startY = 40;
+        int startY = 46;
         int fieldWidth = 280;
         int fieldHeight = 20;
-        int gap = 28;
+        int gap = 32;
 
         displayNameField = new EditBox(this.font, centerX - fieldWidth / 2, startY, fieldWidth, fieldHeight,
                 Component.translatable("gui.discraft.mapping.label.name"));
         displayNameField.setMaxLength(64);
         displayNameField.setValue(mapping.displayName);
-        displayNameField.setSuggestion(Component.translatable("gui.discraft.mapping.hint.name").getString());
+        String hintName = Component.translatable("gui.discraft.mapping.hint.name").getString();
+        displayNameField.setSuggestion(mapping.displayName.isEmpty() ? hintName : "");
+        displayNameField.setResponder(t -> displayNameField.setSuggestion(t.isEmpty() ? hintName : ""));
         addRenderableWidget(displayNameField);
 
         int y2 = startY + gap;
@@ -52,7 +54,9 @@ public class MappingEditScreen extends Screen {
                 Component.translatable("gui.discraft.mapping.label.webhook"));
         webhookUrlField.setMaxLength(256);
         webhookUrlField.setValue(mapping.webhookUrl);
-        webhookUrlField.setSuggestion(Component.translatable("gui.discraft.mapping.hint.webhook").getString());
+        String hintWebhook = Component.translatable("gui.discraft.mapping.hint.webhook").getString();
+        webhookUrlField.setSuggestion(mapping.webhookUrl.isEmpty() ? hintWebhook : "");
+        webhookUrlField.setResponder(t -> webhookUrlField.setSuggestion(t.isEmpty() ? hintWebhook : ""));
         addRenderableWidget(webhookUrlField);
 
         int y3 = y2 + gap;
@@ -60,7 +64,9 @@ public class MappingEditScreen extends Screen {
                 Component.translatable("gui.discraft.mapping.label.voice"));
         voiceChannelIdField.setMaxLength(32);
         voiceChannelIdField.setValue(mapping.voiceChannelId);
-        voiceChannelIdField.setSuggestion(Component.translatable("gui.discraft.mapping.hint.voice").getString());
+        String hintVoice = Component.translatable("gui.discraft.mapping.hint.voice").getString();
+        voiceChannelIdField.setSuggestion(mapping.voiceChannelId.isEmpty() ? hintVoice : "");
+        voiceChannelIdField.setResponder(t -> voiceChannelIdField.setSuggestion(t.isEmpty() ? hintVoice : ""));
         addRenderableWidget(voiceChannelIdField);
 
         int checkY = y3 + gap + 4;
@@ -104,8 +110,8 @@ public class MappingEditScreen extends Screen {
 
         int centerX = this.width / 2;
         int fieldWidth = 280;
-        int startY = 40;
-        int gap = 28;
+        int startY = 46;
+        int gap = 32;
         int labelX = centerX - fieldWidth / 2;
 
         this.font.drawShadow(poseStack, Component.translatable("gui.discraft.mapping.label.name"),

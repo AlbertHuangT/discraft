@@ -16,7 +16,7 @@ public class AddMappingScreen extends Screen {
     private TextFieldWidget contextKeyField;
 
     public AddMappingScreen(Screen parent) {
-        super(Text.literal("添加新映射"));
+        super(Text.translatable("gui.discraft.add.title"));
         this.parent = parent;
     }
 
@@ -26,13 +26,13 @@ public class AddMappingScreen extends Screen {
 
         contextKeyField = addDrawableChild(new TextFieldWidget(
                 textRenderer, centerX - 140, this.height / 2 - 10, 280, 20,
-                Text.literal("上下文 key")));
+                Text.translatable("gui.discraft.add.context_label")));
         contextKeyField.setMaxLength(128);
-        contextKeyField.setSuggestion("例：server:hypixel.net 或 world:我的存档");
+        contextKeyField.setSuggestion(Text.translatable("gui.discraft.add.hint").getString());
 
         int btnY = this.height / 2 + 20;
         addDrawableChild(new ButtonWidget(centerX - 55, btnY, 50, 20,
-                Text.literal("下一步"), btn -> {
+                Text.translatable("gui.discraft.add.next"), btn -> {
             String key = contextKeyField.getText().trim();
             if (!key.isBlank()) {
                 client.setScreen(new MappingEditScreen(parent, key));
@@ -40,7 +40,7 @@ public class AddMappingScreen extends Screen {
         }));
 
         addDrawableChild(new ButtonWidget(centerX + 5, btnY, 50, 20,
-                Text.literal("取消"), btn -> client.setScreen(parent)));
+                Text.translatable("gui.discraft.add.cancel"), btn -> client.setScreen(parent)));
     }
 
     @Override
@@ -48,10 +48,10 @@ public class AddMappingScreen extends Screen {
         renderBackground(matrices);
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
         drawCenteredText(matrices, textRenderer,
-                Text.literal("§7进入存档/服务器后按 G 可自动识别上下文"),
+                Text.translatable("gui.discraft.add.tip"),
                 this.width / 2, this.height / 2 - 30, 0xAAAAAA);
         drawTextWithShadow(matrices, textRenderer,
-                Text.literal("上下文 Key："),
+                Text.translatable("gui.discraft.add.context_label"),
                 this.width / 2 - 140, this.height / 2 - 22, 0xCCCCCC);
         super.render(matrices, mouseX, mouseY, delta);
     }

@@ -28,7 +28,7 @@ public class MappingEditScreen extends Screen {
     private CheckboxWidget advancementsCheck;
 
     public MappingEditScreen(Screen parent, String contextKey) {
-        super(Text.literal("编辑 Discord 频道映射"));
+        super(Text.translatable("gui.discraft.mapping.title"));
         this.parent = parent;
         this.contextKey = contextKey;
         WorldMapping existing = DisCraft.CONFIG.getMapping(contextKey);
@@ -45,28 +45,28 @@ public class MappingEditScreen extends Screen {
 
         // 显示名
         displayNameField = new TextFieldWidget(textRenderer, centerX - fieldWidth / 2, startY, fieldWidth, fieldHeight,
-                Text.literal("显示名"));
+                Text.translatable("gui.discraft.mapping.label.name"));
         displayNameField.setMaxLength(64);
         displayNameField.setText(mapping.displayName);
-        displayNameField.setSuggestion("例：我的生存服（可选）");
+        displayNameField.setSuggestion(Text.translatable("gui.discraft.mapping.hint.name").getString());
         addDrawableChild(displayNameField);
 
         // Webhook URL
         int y2 = startY + gap;
         webhookUrlField = new TextFieldWidget(textRenderer, centerX - fieldWidth / 2, y2, fieldWidth, fieldHeight,
-                Text.literal("Webhook URL"));
+                Text.translatable("gui.discraft.mapping.label.webhook"));
         webhookUrlField.setMaxLength(256);
         webhookUrlField.setText(mapping.webhookUrl);
-        webhookUrlField.setSuggestion("https://discord.com/api/webhooks/...");
+        webhookUrlField.setSuggestion(Text.translatable("gui.discraft.mapping.hint.webhook").getString());
         addDrawableChild(webhookUrlField);
 
         // 语音频道 ID
         int y3 = y2 + gap;
         voiceChannelIdField = new TextFieldWidget(textRenderer, centerX - fieldWidth / 2, y3, fieldWidth, fieldHeight,
-                Text.literal("语音频道 ID"));
+                Text.translatable("gui.discraft.mapping.label.voice"));
         voiceChannelIdField.setMaxLength(32);
         voiceChannelIdField.setText(mapping.voiceChannelId);
-        voiceChannelIdField.setSuggestion("Discord 语音频道 ID（进入存档时自动加入）");
+        voiceChannelIdField.setSuggestion(Text.translatable("gui.discraft.mapping.hint.voice").getString());
         addDrawableChild(voiceChannelIdField);
 
         // 复选框
@@ -75,30 +75,30 @@ public class MappingEditScreen extends Screen {
         int col2 = centerX + 10;
 
         enabledCheck = addDrawableChild(new CheckboxWidget(col1, checkY, 140, 20,
-                Text.literal("启用此映射"), mapping.enabled));
+                Text.translatable("gui.discraft.mapping.enabled"), mapping.enabled));
         sendCheck = addDrawableChild(new CheckboxWidget(col2, checkY, 160, 20,
-                Text.literal("发送游戏消息到 Discord"), mapping.sendToDiscord));
+                Text.translatable("gui.discraft.mapping.forward_chat"), mapping.sendToDiscord));
 
         int checkY2 = checkY + 24;
         joinLeaveCheck = addDrawableChild(new CheckboxWidget(col1, checkY2, 140, 20,
-                Text.literal("显示加入/离开"), mapping.showJoinLeave));
+                Text.translatable("gui.discraft.mapping.show_join_leave"), mapping.showJoinLeave));
         deathsCheck = addDrawableChild(new CheckboxWidget(col2, checkY2, 160, 20,
-                Text.literal("显示死亡事件"), mapping.showDeaths));
+                Text.translatable("gui.discraft.mapping.show_death"), mapping.showDeaths));
 
         int checkY3 = checkY2 + 24;
         advancementsCheck = addDrawableChild(new CheckboxWidget(col1, checkY3, 180, 20,
-                Text.literal("显示成就通知"), mapping.showAdvancements));
+                Text.translatable("gui.discraft.mapping.show_advancements"), mapping.showAdvancements));
 
         // 底部按钮
         int buttonY = this.height - 40;
         addDrawableChild(new ButtonWidget(centerX - 110, buttonY, 100, 20,
-                Text.literal("保存"), btn -> saveAndClose()));
+                Text.translatable("gui.discraft.mapping.save"), btn -> saveAndClose()));
 
         addDrawableChild(new ButtonWidget(centerX - 5, buttonY, 100, 20,
-                Text.literal("删除映射"), btn -> deleteAndClose()));
+                Text.translatable("gui.discraft.mapping.delete"), btn -> deleteAndClose()));
 
         addDrawableChild(new ButtonWidget(centerX + 110, buttonY, 60, 20,
-                Text.literal("取消"), btn -> client.setScreen(parent)));
+                Text.translatable("gui.discraft.mapping.cancel"), btn -> client.setScreen(parent)));
     }
 
     @Override
@@ -107,7 +107,8 @@ public class MappingEditScreen extends Screen {
 
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 14, 0xFFFFFF);
         drawCenteredText(matrices, textRenderer,
-                Text.literal("§7上下文: " + contextKey), this.width / 2, 26, 0xAAAAAA);
+                Text.translatable("gui.discraft.mapping.context_label").append(contextKey),
+                this.width / 2, 26, 0xAAAAAA);
 
         int centerX = this.width / 2;
         int fieldWidth = 280;
@@ -115,9 +116,9 @@ public class MappingEditScreen extends Screen {
         int gap = 28;
         int labelX = centerX - fieldWidth / 2;
 
-        drawTextWithShadow(matrices, textRenderer, Text.literal("显示名"), labelX, startY - 10, 0xCCCCCC);
-        drawTextWithShadow(matrices, textRenderer, Text.literal("Webhook URL（发送消息用）"), labelX, startY + gap - 10, 0xCCCCCC);
-        drawTextWithShadow(matrices, textRenderer, Text.literal("语音频道 ID（进入存档时自动加入）"), labelX, startY + gap * 2 - 10, 0xCCCCCC);
+        drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.mapping.label.name"), labelX, startY - 10, 0xCCCCCC);
+        drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.mapping.label.webhook"), labelX, startY + gap - 10, 0xCCCCCC);
+        drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.mapping.label.voice"), labelX, startY + gap * 2 - 10, 0xCCCCCC);
 
         super.render(matrices, mouseX, mouseY, delta);
     }

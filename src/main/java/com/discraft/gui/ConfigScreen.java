@@ -25,7 +25,7 @@ public class ConfigScreen extends Screen {
     private List<Map.Entry<String, WorldMapping>> mappingEntries = new ArrayList<>();
 
     public ConfigScreen(Screen parent) {
-        super(Text.literal("DisCraft 设置"));
+        super(Text.translatable("gui.discraft.config.title"));
         this.parent = parent;
     }
 
@@ -37,7 +37,7 @@ public class ConfigScreen extends Screen {
 
         // 授权 Discord 按钮（Y=40）
         addDrawableChild(new ButtonWidget(centerX - 100, 40, 200, 20,
-                Text.literal("授权 Discord（语音功能必须）"), btn -> {
+                Text.translatable("gui.discraft.config.authorize"), btn -> {
             btn.active = false;
             DisCraft.BRIDGE.startIpcAuth(client);
             Thread t = new Thread(() -> {
@@ -50,11 +50,11 @@ public class ConfigScreen extends Screen {
 
         // 当前上下文的快捷编辑按钮（Y=64）
         String ctx = DisCraft.BRIDGE.getCurrentContext();
-        String ctxLabel = (ctx != null)
-                ? "编辑当前：" + shortenContext(ctx)
-                : "未在游戏中";
+        Text ctxLabel = (ctx != null)
+                ? Text.translatable("gui.discraft.config.edit_current").append(shortenContext(ctx))
+                : Text.translatable("gui.discraft.config.not_in_game");
         addDrawableChild(new ButtonWidget(centerX - 100, 64, 200, 20,
-                Text.literal(ctxLabel), btn -> {
+                ctxLabel, btn -> {
             if (ctx != null) client.setScreen(new MappingEditScreen(this, ctx));
         }));
 
@@ -95,10 +95,10 @@ public class ConfigScreen extends Screen {
         // 底部按钮
         int bottomY = this.height - 30;
         addDrawableChild(new ButtonWidget(centerX - 120, bottomY, 110, 20,
-                Text.literal("添加新映射"), btn -> client.setScreen(new AddMappingScreen(this))));
+                Text.translatable("gui.discraft.config.add_mapping"), btn -> client.setScreen(new AddMappingScreen(this))));
 
         addDrawableChild(new ButtonWidget(centerX + 10, bottomY, 110, 20,
-                Text.literal("完成"), btn -> close()));
+                Text.translatable("gui.discraft.config.done"), btn -> close()));
     }
 
     @Override
@@ -109,13 +109,14 @@ public class ConfigScreen extends Screen {
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 14, 0xFFFFFF);
 
         // 语音连接状态（Y=88）
-        String statusText = DisCraft.BRIDGE.isVoiceConnected()
-                ? "§a● 语音已连接" : "§7○ Discord 未运行或未授权";
-        drawTextWithShadow(matrices, textRenderer, Text.literal(statusText),
+        Text statusText = DisCraft.BRIDGE.isVoiceConnected()
+                ? Text.translatable("gui.discraft.config.voice_connected")
+                : Text.translatable("gui.discraft.config.voice_disconnected");
+        drawTextWithShadow(matrices, textRenderer, statusText,
                 this.width / 2 - 150, 88, 0xFFFFFF);
 
         // 映射列表标题（Y=108）
-        drawTextWithShadow(matrices, textRenderer, Text.literal("§e所有频道映射："),
+        drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.discraft.config.mappings_title"),
                 this.width / 2 - 150, 108, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, delta);

@@ -1,11 +1,12 @@
 # DisCraft
 
-> Minecraft 1.19.2 Fabric 客户端 Mod — 双向桥接游戏内聊天与 Discord
+> Minecraft 1.19.2 Fabric 客户端 Mod — 双向桥接游戏内聊天与 Discord，并支持自动加入语音频道
 
 ## 功能
 
 - **游戏 → Discord**：玩家聊天消息通过 Webhook 实时转发到 Discord 频道
 - **Discord → 游戏**：通过 Bot Gateway WebSocket 接收 Discord 消息，显示在游戏聊天栏
+- **自动语音频道**：进入存档/服务器时自动加入配置的 Discord 语音频道，离开时自动退出（需 Discord 在后台运行）
 - **多上下文映射**：按存档名 / 服务器 IP 独立配置不同的 Discord 频道
 - **事件通知**：可选转发加入、离开、死亡事件到 Discord
 - **图形配置界面**：按 `G` 键打开设置，无需手动编辑配置文件
@@ -34,8 +35,20 @@
 操作步骤：
 
 1. 创建 Bot，复制 Token
-2. 按 `G` → 填入 Bot Token → 保存 Token
-3. 编辑映射 → 填入目标 Discord 频道 ID → 勾选"接收 Discord 消息"
+2. 按 `G` → 添加新映射 → 填入 Bot Token → 勾选"接收 Discord 消息"
+
+### 语音频道自动切换
+
+使用 Discord IPC 控制本地 Discord 客户端，需要创建一个 Discord 应用并完成一次 OAuth2 授权：
+
+1. 前往 [Discord Developer Portal](https://discord.com/developers/applications) 创建新应用
+2. 在应用的 **OAuth2** 页面，将 Redirect URL 设为 `http://localhost`，并启用 **RPC** scope
+3. 复制 **Client ID** 和 **Client Secret**
+4. 在游戏中按 `G` → 在顶部两个输入框填入 Client ID 和 Client Secret → 点击**保存应用设置**
+5. 点击**授权 Discord（语音功能必须）** → Discord 客户端弹出授权对话框 → 点击授权
+6. 在映射编辑页面填入目标语音频道 ID，进入对应存档/服务器后即自动加入
+
+> 授权凭据保存在 `config/discraft/config.json`，仅需配置一次。Discord 需在后台运行。
 
 ## 构建
 
@@ -57,6 +70,7 @@ src/main/java/com/discraft/
 │   ├── DisCraftConfig.java    # 配置 POJO，Gson 序列化
 │   └── WorldMapping.java      # 单个频道映射配置
 ├── discord/
+│   ├── DiscordIpc.java        # Discord IPC 客户端（语音频道控制）
 │   ├── GatewayClient.java     # Discord Gateway WebSocket
 │   └── WebhookClient.java     # Discord Webhook HTTP 客户端
 ├── gui/

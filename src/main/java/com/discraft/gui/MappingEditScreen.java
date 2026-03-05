@@ -20,18 +20,17 @@ public class MappingEditScreen extends Screen {
 
     private TextFieldWidget displayNameField;
     private TextFieldWidget webhookUrlField;
-    private TextFieldWidget channelIdField;
+    private TextFieldWidget voiceChannelIdField;
     private CheckboxWidget enabledCheck;
     private CheckboxWidget sendCheck;
-    private CheckboxWidget receiveCheck;
     private CheckboxWidget joinLeaveCheck;
     private CheckboxWidget deathsCheck;
+    private CheckboxWidget advancementsCheck;
 
     public MappingEditScreen(Screen parent, String contextKey) {
         super(Text.literal("编辑 Discord 频道映射"));
         this.parent = parent;
         this.contextKey = contextKey;
-        // 加载已有配置，或创建新的
         WorldMapping existing = DisCraft.CONFIG.getMapping(contextKey);
         this.mapping = (existing != null) ? existing : new WorldMapping();
     }
@@ -61,14 +60,14 @@ public class MappingEditScreen extends Screen {
         webhookUrlField.setSuggestion("https://discord.com/api/webhooks/...");
         addDrawableChild(webhookUrlField);
 
-        // Channel ID（用于接收消息，需要 Bot Token）
+        // 语音频道 ID
         int y3 = y2 + gap;
-        channelIdField = new TextFieldWidget(textRenderer, centerX - fieldWidth / 2, y3, fieldWidth, fieldHeight,
-                Text.literal("Channel ID"));
-        channelIdField.setMaxLength(32);
-        channelIdField.setText(mapping.channelId);
-        channelIdField.setSuggestion("频道 ID（需要 Bot Token 才能接收消息）");
-        addDrawableChild(channelIdField);
+        voiceChannelIdField = new TextFieldWidget(textRenderer, centerX - fieldWidth / 2, y3, fieldWidth, fieldHeight,
+                Text.literal("语音频道 ID"));
+        voiceChannelIdField.setMaxLength(32);
+        voiceChannelIdField.setText(mapping.voiceChannelId);
+        voiceChannelIdField.setSuggestion("Discord 语音频道 ID（进入存档时自动加入）");
+        addDrawableChild(voiceChannelIdField);
 
         // 复选框
         int checkY = y3 + gap + 4;
@@ -77,18 +76,18 @@ public class MappingEditScreen extends Screen {
 
         enabledCheck = addDrawableChild(new CheckboxWidget(col1, checkY, 140, 20,
                 Text.literal("启用此映射"), mapping.enabled));
-        sendCheck = addDrawableChild(new CheckboxWidget(col2, checkY, 150, 20,
+        sendCheck = addDrawableChild(new CheckboxWidget(col2, checkY, 160, 20,
                 Text.literal("发送游戏消息到 Discord"), mapping.sendToDiscord));
 
         int checkY2 = checkY + 24;
-        receiveCheck = addDrawableChild(new CheckboxWidget(col1, checkY2, 140, 20,
-                Text.literal("接收 Discord 消息"), mapping.receiveFromDiscord));
-        joinLeaveCheck = addDrawableChild(new CheckboxWidget(col2, checkY2, 150, 20,
-                Text.literal("显示加入/离开事件"), mapping.showJoinLeave));
+        joinLeaveCheck = addDrawableChild(new CheckboxWidget(col1, checkY2, 140, 20,
+                Text.literal("显示加入/离开"), mapping.showJoinLeave));
+        deathsCheck = addDrawableChild(new CheckboxWidget(col2, checkY2, 160, 20,
+                Text.literal("显示死亡事件"), mapping.showDeaths));
 
         int checkY3 = checkY2 + 24;
-        deathsCheck = addDrawableChild(new CheckboxWidget(col1, checkY3, 140, 20,
-                Text.literal("显示死亡事件"), mapping.showDeaths));
+        advancementsCheck = addDrawableChild(new CheckboxWidget(col1, checkY3, 180, 20,
+                Text.literal("显示成就通知"), mapping.showAdvancements));
 
         // 底部按钮
         int buttonY = this.height - 40;
@@ -106,14 +105,10 @@ public class MappingEditScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
 
-        // 标题
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 14, 0xFFFFFF);
-
-        // 上下文 key 说明
         drawCenteredText(matrices, textRenderer,
                 Text.literal("§7上下文: " + contextKey), this.width / 2, 26, 0xAAAAAA);
 
-        // 字段标签
         int centerX = this.width / 2;
         int fieldWidth = 280;
         int startY = 40;
@@ -122,7 +117,7 @@ public class MappingEditScreen extends Screen {
 
         drawTextWithShadow(matrices, textRenderer, Text.literal("显示名"), labelX, startY - 10, 0xCCCCCC);
         drawTextWithShadow(matrices, textRenderer, Text.literal("Webhook URL（发送消息用）"), labelX, startY + gap - 10, 0xCCCCCC);
-        drawTextWithShadow(matrices, textRenderer, Text.literal("Discord 频道 ID（接收消息用）"), labelX, startY + gap * 2 - 10, 0xCCCCCC);
+        drawTextWithShadow(matrices, textRenderer, Text.literal("语音频道 ID（进入存档时自动加入）"), labelX, startY + gap * 2 - 10, 0xCCCCCC);
 
         super.render(matrices, mouseX, mouseY, delta);
     }
@@ -130,12 +125,12 @@ public class MappingEditScreen extends Screen {
     private void saveAndClose() {
         mapping.displayName = displayNameField.getText().trim();
         mapping.webhookUrl = webhookUrlField.getText().trim();
-        mapping.channelId = channelIdField.getText().trim();
+        mapping.voiceChannelId = voiceChannelIdField.getText().trim();
         mapping.enabled = enabledCheck.isChecked();
         mapping.sendToDiscord = sendCheck.isChecked();
-        mapping.receiveFromDiscord = receiveCheck.isChecked();
         mapping.showJoinLeave = joinLeaveCheck.isChecked();
         mapping.showDeaths = deathsCheck.isChecked();
+        mapping.showAdvancements = advancementsCheck.isChecked();
 
         DisCraft.CONFIG.setMapping(contextKey, mapping);
         DisCraft.CONFIG.save();
@@ -147,5 +142,4 @@ public class MappingEditScreen extends Screen {
         DisCraft.CONFIG.save();
         client.setScreen(parent);
     }
-
 }

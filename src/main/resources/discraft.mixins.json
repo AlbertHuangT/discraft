@@ -3,7 +3,8 @@
   "package": "com.discraft.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "ChatScreenMixin"
+    "ChatScreenMixin",
+    "AdvancementToastMixin"
   ],
   "injectors": {
     "defaultRequire": 1

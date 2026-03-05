@@ -21,8 +21,14 @@ public class DisCraftConfig {
 
     // ---- 字段 ----
 
-    /** Discord Bot Token（需要在 Discord Developer Portal 启用 MESSAGE_CONTENT 权限意图） */
-    public String botToken = "";
+    /** Discord 应用 Client ID（在 Discord Developer Portal 获取） */
+    public String discordClientId = "";
+
+    /** Discord 应用 Client Secret（在 Discord Developer Portal 获取） */
+    public String discordClientSecret = "";
+
+    /** Discord OAuth2 access_token（通过 IPC 授权流程获取，自动保存） */
+    public String discordAccessToken = "";
 
     /**
      * 存档/服务器上下文 -> Discord 频道映射。
@@ -40,6 +46,9 @@ public class DisCraftConfig {
                 DisCraftConfig cfg = GSON.fromJson(json, DisCraftConfig.class);
                 if (cfg != null) {
                     if (cfg.mappings == null) cfg.mappings = new HashMap<>();
+                    if (cfg.discordAccessToken == null) cfg.discordAccessToken = "";
+                    if (cfg.discordClientId == null) cfg.discordClientId = "";
+                    if (cfg.discordClientSecret == null) cfg.discordClientSecret = "";
                     return cfg;
                 }
             }
@@ -70,9 +79,5 @@ public class DisCraftConfig {
 
     public void removeMapping(String context) {
         mappings.remove(context);
-    }
-
-    public boolean hasBotToken() {
-        return !botToken.isBlank();
     }
 }

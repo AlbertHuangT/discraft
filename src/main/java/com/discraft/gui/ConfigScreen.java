@@ -14,16 +14,19 @@ import java.util.Map;
 
 /**
  * DisCraft 主设置界面。
- * 显示：Bot Token 设置、当前上下文、所有已有映射列表。
+ * 显示：Discord 授权状态、当前上下文、所有已有映射列表。
  */
 public class ConfigScreen extends Screen {
 
     private final Screen parent;
-    private TextFieldWidget botTokenField;
+
+    // 凭据输入框
+    private TextFieldWidget clientIdField;
+    private TextFieldWidget clientSecretField;
 
     // 映射列表分页
     private int scrollOffset = 0;
-    private static final int ENTRIES_PER_PAGE = 4;
+    private static final int ENTRIES_PER_PAGE = 3;
     private List<Map.Entry<String, WorldMapping>> mappingEntries = new ArrayList<>();
 
     public ConfigScreen(Screen parent) {
@@ -36,29 +39,48 @@ public class ConfigScreen extends Screen {
         refreshMappingEntries();
 
         int centerX = this.width / 2;
-        int fieldWidth = 300;
+        int fieldWidth = 220;
+        int gap = 4;
+        // 两个输入框并排，总宽 = fieldWidth*2 + gap
+        int totalFieldWidth = fieldWidth * 2 + gap;
+        int leftFieldX = centerX - totalFieldWidth / 2;
+        int rightFieldX = leftFieldX + fieldWidth + gap;
 
-        // Bot Token 输入框
-        botTokenField = addDrawableChild(new TextFieldWidget(
-                textRenderer, centerX - fieldWidth / 2, 48, fieldWidth, 20,
-                Text.literal("Bot Token")));
-        botTokenField.setMaxLength(128);
-        botTokenField.setText(DisCraft.CONFIG.botToken);
-        botTokenField.setSuggestion("Discord Bot Token（接收消息必填）");
+        // Client ID 输入框
+        clientIdField = new TextFieldWidget(textRenderer, leftFieldX, 30, fieldWidth, 18,
+                Text.literal("Client ID"));
+        clientIdField.setMaxLength(64);
+        clientIdField.setText(DisCraft.CONFIG.discordClientId);
+        addDrawableChild(clientIdField);
 
-        // 保存 Token 按钮
-        addDrawableChild(new ButtonWidget(centerX + fieldWidth / 2 + 4, 48, 70, 20,
-                Text.literal("保存 Token"), btn -> {
-            DisCraft.CONFIG.botToken = botTokenField.getText().trim();
+        // Client Secret 输入框
+        clientSecretField = new TextFieldWidget(textRenderer, rightFieldX, 30, fieldWidth, 18,
+                Text.literal("Client Secret"));
+        clientSecretField.setMaxLength(64);
+        clientSecretField.setText(DisCraft.CONFIG.discordClientSecret);
+        addDrawableChild(clientSecretField);
+
+        // 保存应用设置 + 授权 Discord 按钮（Y=54）
+        addDrawableChild(new ButtonWidget(centerX - 210, 54, 100, 20,
+                Text.literal("保存应用设置"), btn -> {
+            DisCraft.CONFIG.discordClientId = clientIdField.getText().strip();
+            DisCraft.CONFIG.discordClientSecret = clientSecretField.getText().strip();
             DisCraft.CONFIG.save();
-            // 如果当前有活跃上下文，重新连接 Gateway
-            String ctx = DisCraft.BRIDGE.getCurrentContext();
-            if (ctx != null) {
-                DisCraft.BRIDGE.onContextSwitch(ctx, client);
-            }
         }));
 
-        // 当前上下文的快捷编辑按钮
+        addDrawableChild(new ButtonWidget(centerX - 100, 54, 200, 20,
+                Text.literal("授权 Discord（语音功能必须）"), btn -> {
+            btn.active = false;
+            DisCraft.BRIDGE.startIpcAuth(client);
+            Thread t = new Thread(() -> {
+                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                client.execute(() -> btn.active = true);
+            });
+            t.setDaemon(true);
+            t.start();
+        }));
+
+        // 当前上下文的快捷编辑按钮（Y=78）
         String ctx = DisCraft.BRIDGE.getCurrentContext();
         String ctxLabel = (ctx != null)
                 ? "编辑当前：" + shortenContext(ctx)
@@ -68,30 +90,26 @@ public class ConfigScreen extends Screen {
             if (ctx != null) client.setScreen(new MappingEditScreen(this, ctx));
         }));
 
-        // 映射列表翻页按钮
-        addDrawableChild(new ButtonWidget(centerX - 110, 106, 20, 20,
+        // 映射列表翻页按钮（Y=104）
+        addDrawableChild(new ButtonWidget(centerX - 110, 104, 20, 20,
                 Text.literal("◀"), btn -> {
             if (scrollOffset > 0) {
-                String token = botTokenField.getText();
                 scrollOffset--;
                 this.init(client, this.width, this.height);
-                botTokenField.setText(token);
             }
         }));
 
-        addDrawableChild(new ButtonWidget(centerX + 90, 106, 20, 20,
+        addDrawableChild(new ButtonWidget(centerX + 90, 104, 20, 20,
                 Text.literal("▶"), btn -> {
             int maxOffset = Math.max(0, mappingEntries.size() - ENTRIES_PER_PAGE);
             if (scrollOffset < maxOffset) {
-                String token = botTokenField.getText();
                 scrollOffset++;
                 this.init(client, this.width, this.height);
-                botTokenField.setText(token);
             }
         }));
 
-        // 映射条目按钮
-        int startY = 140;
+        // 映射条目按钮（Y=134+）
+        int startY = 134;
         int rowHeight = 24;
         for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
             int entryIndex = scrollOffset + i;
@@ -122,19 +140,21 @@ public class ConfigScreen extends Screen {
         // 标题
         drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 14, 0xFFFFFF);
 
-        // Bot Token 标签
-        drawTextWithShadow(matrices, textRenderer, Text.literal("Bot Token（接收 Discord 消息必填）："),
-                this.width / 2 - 150, 38, 0xCCCCCC);
+        // 凭据输入框标签
+        drawTextWithShadow(matrices, textRenderer, Text.literal("§7Client ID"),
+                this.width / 2 - (220 * 2 + 4) / 2, 20, 0xFFFFFF);
+        drawTextWithShadow(matrices, textRenderer, Text.literal("§7Client Secret"),
+                this.width / 2 - (220 * 2 + 4) / 2 + 220 + 4, 20, 0xFFFFFF);
 
-        // 连接状态
-        String statusText = DisCraft.BRIDGE.isGatewayConnected()
-                ? "§a● 已连接 Discord" : "§7○ 未连接";
+        // 语音连接状态
+        String statusText = DisCraft.BRIDGE.isVoiceConnected()
+                ? "§a● 语音已连接" : "§7○ Discord 未运行或未授权";
         drawTextWithShadow(matrices, textRenderer, Text.literal(statusText),
-                this.width / 2 - 150, 102, 0xFFFFFF);
+                this.width / 2 - 150, 100, 0xFFFFFF);
 
         // 映射列表标题
         drawTextWithShadow(matrices, textRenderer, Text.literal("§e所有频道映射："),
-                this.width / 2 - 150, 128, 0xFFFFFF);
+                this.width / 2 - 150, 122, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, delta);
     }

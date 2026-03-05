@@ -14,8 +14,8 @@ public class WorldMapping {
     /** Discord Webhook URL，用于从游戏发送消息到 Discord */
     public String webhookUrl = "";
 
-    /** Discord 频道 ID，用于接收 Discord 消息（需要 Bot Token） */
-    public String channelId = "";
+    /** Discord 语音频道 ID，进入存档/服务器时自动加入此频道 */
+    public String voiceChannelId = "";
 
     /** 是否启用此映射 */
     public boolean enabled = true;
@@ -23,12 +23,12 @@ public class WorldMapping {
     /** 是否将游戏内聊天转发到 Discord */
     public boolean sendToDiscord = true;
 
-    /** 是否将 Discord 消息显示在游戏内 */
-    public boolean receiveFromDiscord = true;
-
     /** 是否在 Discord 显示玩家加入/离开事件 */
     public boolean showJoinLeave = true;
 
     /** 是否在 Discord 显示玩家死亡事件 */
     public boolean showDeaths = false;
+
+    /** 是否在 Discord 显示玩家获得成就 */
+    public boolean showAdvancements = true;
 }

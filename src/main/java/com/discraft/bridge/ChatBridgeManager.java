@@ -46,8 +46,8 @@ public class ChatBridgeManager {
         // 发送加入通知
         if (currentMapping.showJoinLeave && !currentMapping.webhookUrl.isBlank()) {
             String player = client.getSession().getUsername();
-            webhookClient.sendSystemMessage(currentMapping.webhookUrl,
-                    "🟢 **" + player + "** 加入了游戏");
+            webhookClient.sendEmbedMessage(currentMapping.webhookUrl,
+                    player, player + " 加入了游戏", null, WebhookClient.colorJoin());
         }
 
         // 尝试加入语音频道（后台线程）
@@ -74,8 +74,8 @@ public class ChatBridgeManager {
                 && currentMapping.showJoinLeave
                 && !currentMapping.webhookUrl.isBlank()) {
             String player = client.getSession().getUsername();
-            webhookClient.sendSystemMessage(currentMapping.webhookUrl,
-                    "🔴 **" + player + "** 离开了游戏");
+            webhookClient.sendEmbedMessage(currentMapping.webhookUrl,
+                    player, player + " 离开了游戏", null, WebhookClient.colorLeave());
         }
         leaveVoice(client);
         currentMapping = null;
@@ -99,7 +99,11 @@ public class ChatBridgeManager {
         if (!isActive()) return;
         if (!currentMapping.showDeaths) return;
         if (currentMapping.webhookUrl.isBlank()) return;
-        webhookClient.sendSystemMessage(currentMapping.webhookUrl, "💀 " + deathMessage);
+        // 死亡消息中通常不包含玩家名单独字段，用空字符串作为头像回退
+        String[] parts = deathMessage.split(" ", 2);
+        String deadPlayer = parts[0];
+        webhookClient.sendEmbedMessage(currentMapping.webhookUrl,
+                deadPlayer, deathMessage, null, WebhookClient.colorDeath());
     }
 
     /** 玩家获得成就时调用（由 AdvancementToastMixin 触发） */
@@ -107,8 +111,10 @@ public class ChatBridgeManager {
         if (!isActive()) return;
         if (!currentMapping.showAdvancements) return;
         if (currentMapping.webhookUrl.isBlank()) return;
-        webhookClient.sendSystemMessage(currentMapping.webhookUrl,
-                "🏆 **" + title.getString() + "** — " + description.getString());
+        MinecraftClient client = MinecraftClient.getInstance();
+        String player = (client != null && client.getSession() != null) ? client.getSession().getUsername() : "";
+        webhookClient.sendEmbedMessage(currentMapping.webhookUrl,
+                player, title.getString(), description.getString(), WebhookClient.colorAdv());
     }
 
     // ---- IPC 控制 ----

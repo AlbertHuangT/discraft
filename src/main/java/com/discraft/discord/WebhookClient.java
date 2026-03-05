@@ -45,6 +45,43 @@ public class WebhookClient {
         });
     }
 
+    // Embed 颜色常量
+    private static final int COLOR_JOIN  = 0x57F287; // 绿
+    private static final int COLOR_LEAVE = 0xED4245; // 红
+    private static final int COLOR_DEATH = 0x2C2F33; // 深灰
+    private static final int COLOR_ADV   = 0xFEE75C; // 金
+
+    /**
+     * 发送带 Embed 的系统事件通知（加入/离开/死亡/成就）。
+     * @param playerName 玩家名，用于头像 URL
+     * @param title      Embed author 文字
+     * @param description 副标题（成就描述），null 则不加
+     * @param color      Embed 颜色（见颜色常量）
+     */
+    public void sendEmbedMessage(String webhookUrl, String playerName, String title, String description, int color) {
+        if (isBlankUrl(webhookUrl)) return;
+        executor.submit(() -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{\"embeds\":[{");
+            sb.append("\"author\":{\"name\":\"").append(escapeJson(title)).append("\"");
+            if (playerName != null && !playerName.isBlank()) {
+                sb.append(",\"icon_url\":\"https://minotar.net/avatar/").append(playerName).append("/64\"");
+            }
+            sb.append("}");
+            if (description != null) {
+                sb.append(",\"description\":\"").append(escapeJson(description)).append("\"");
+            }
+            sb.append(",\"color\":").append(color);
+            sb.append("}]}");
+            post(webhookUrl, sb.toString());
+        });
+    }
+
+    public static int colorJoin()  { return COLOR_JOIN; }
+    public static int colorLeave() { return COLOR_LEAVE; }
+    public static int colorDeath() { return COLOR_DEATH; }
+    public static int colorAdv()   { return COLOR_ADV; }
+
     /**
      * 以 DisCraft 系统身份发送事件通知（加入/离开/死亡等）。
      */
@@ -73,6 +110,14 @@ public class WebhookClient {
         } catch (Exception e) {
             LOGGER.error("[DisCraft] Webhook 发送异常", e);
         }
+    }
+
+    /** 转义 JSON 字符串中的特殊字符 */
+    private String escapeJson(String text) {
+        return text.replace("\\", "\\\\")
+                   .replace("\"", "\\\"")
+                   .replace("\n", "\\n")
+                   .replace("\r", "\\r");
     }
 
     /** 简单转义 Discord Markdown 特殊字符，防止意外格式化 */

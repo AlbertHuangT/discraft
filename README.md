@@ -80,3 +80,7 @@ src/main/java/com/discraft/
 ## License
 
 MIT
+
+## Credits
+
+Embed 通知的颜色方案和 author 格式参考了 [jenchanws/discraft](https://github.com/jenchanws/discraft)（MIT License）。详见 [CREDITS.md](CREDITS.md)。

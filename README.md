@@ -1,11 +1,10 @@
 # DisCraft
 
-> Minecraft 1.19.2 Fabric 客户端 Mod — 双向桥接游戏内聊天与 Discord，并支持自动加入语音频道
+> Minecraft 1.19.2 Fabric 客户端 Mod — 桥接游戏内聊天与 Discord，并支持自动加入语音频道
 
 ## 功能
 
 - **游戏 → Discord**：玩家聊天消息通过 Webhook 实时转发到 Discord 频道
-- **Discord → 游戏**：通过 Bot Gateway WebSocket 接收 Discord 消息，显示在游戏聊天栏
 - **自动语音频道**：进入存档/服务器时自动加入配置的 Discord 语音频道，离开时自动退出（需 Discord 在后台运行）
 - **多上下文映射**：按存档名 / 服务器 IP 独立配置不同的 Discord 频道
 - **事件通知**：可选转发加入、离开、死亡事件到 Discord
@@ -25,17 +24,6 @@
 
 1. Discord 频道设置 → 整合 → Webhook → 新 Webhook → 复制 URL
 2. 按 `G` → 添加新映射 → 填入 Webhook URL → 启用
-
-### 收发双向（Discord → 游戏）
-
-需要 Discord Bot Token，并在 [Discord Developer Portal](https://discord.com/developers/applications) 开启：
-
-- `MESSAGE CONTENT INTENT`（必须）
-
-操作步骤：
-
-1. 创建 Bot，复制 Token
-2. 按 `G` → 添加新映射 → 填入 Bot Token → 勾选"接收 Discord 消息"
 
 ### 语音频道自动切换
 
@@ -71,7 +59,6 @@ src/main/java/com/discraft/
 │   └── WorldMapping.java      # 单个频道映射配置
 ├── discord/
 │   ├── DiscordIpc.java        # Discord IPC 客户端（语音频道控制）
-│   ├── GatewayClient.java     # Discord Gateway WebSocket
 │   └── WebhookClient.java     # Discord Webhook HTTP 客户端
 ├── gui/
 │   ├── ConfigScreen.java      # 主设置界面

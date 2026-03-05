@@ -1,0 +1,46 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Fabric
+        run: ./gradlew build
+
+      - name: Build Forge
+        run: cd forge && ./gradlew build
+
+      - name: Get version
+        id: ver
+        run: echo "v=$(grep '^mod_version' gradle.properties | cut -d= -f2 | tr -d ' ')" >> $GITHUB_OUTPUT
+
+      - name: Update rolling release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: "Latest Build (1.19.2)"
+          body: |
+            Auto-built from commit ${{ github.sha }}
+            `${{ github.event.head_commit.message }}`
+          allowUpdates: true
+          removeArtifacts: true
+          prerelease: true
+          artifacts: |
+            build/libs/discraft-${{ steps.ver.outputs.v }}.jar
+            forge/build/libs/discraft-forge-${{ steps.ver.outputs.v }}.jar

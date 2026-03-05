@@ -1,81 +1,73 @@
+[🇨🇳 中文](README.zh.md)
+
 # DisCraft
 
-> Minecraft 1.19.2 Fabric 客户端 Mod — 桥接游戏内聊天与 Discord，并支持自动加入语音频道
+> Minecraft 1.19.2 Fabric & Forge client mod — bridges in-game chat with Discord, with automatic voice channel joining
 
-## 功能
+## Features
 
-- **游戏 → Discord**：玩家聊天消息通过 Webhook 实时转发到 Discord 频道
-- **自动语音频道**：进入存档/服务器时自动加入配置的 Discord 语音频道，离开时自动退出（需 Discord 在后台运行）
-- **多上下文映射**：按存档名 / 服务器 IP 独立配置不同的 Discord 频道
-- **事件通知**：可选转发加入、离开、死亡事件到 Discord
-- **图形配置界面**：按 `G` 键打开设置，无需手动编辑配置文件
+- **Game → Discord**: Player chat forwarded to Discord via Webhook in real time
+- **Auto voice channel**: Auto-joins configured Discord voice channel on world/server join; leaves on disconnect (requires Discord running in background)
+- **Multi-context mappings**: Per-world name / server IP independent Discord channel config
+- **Event notifications**: Optional join, leave, death event forwarding to Discord
+- **GUI config**: Press `G` to open settings — no config file editing needed
 
-## 安装
+## Download
 
-1. 前置依赖：[Fabric Loader](https://fabricmc.net/) ≥ 0.14.9 + [Fabric API](https://modrinth.com/mod/fabric-api) 0.76.x（1.19.2）
-2. 下载 `discraft-1.0.0.jar`，放入 Minecraft `mods/` 文件夹
-3. 启动游戏，按 `G` 键打开 DisCraft 设置
+Latest build is available in [Releases](https://github.com/AlbertHuangT/discraft/releases/tag/latest):
+- `discraft-1.0.0.jar` — Fabric (requires Fabric API)
+- `discraft-forge-1.0.0.jar` — Forge
 
-## 配置
+## Installation
 
-### 仅发送消息（游戏 → Discord）
+1. **Fabric**: Requires [Fabric Loader](https://fabricmc.net/) ≥ 0.14.9 + [Fabric API](https://modrinth.com/mod/fabric-api) 0.76.x (1.19.2)
+2. Drop the JAR into your Minecraft `mods/` folder
+3. Launch the game, press `G` to open DisCraft settings
 
-只需 Webhook URL，无需 Bot Token：
+## Configuration
 
-1. Discord 频道设置 → 整合 → Webhook → 新 Webhook → 复制 URL
-2. 按 `G` → 添加新映射 → 填入 Webhook URL → 启用
+### Chat bridge only (Game → Discord)
 
-### 语音频道自动切换
+Only a Webhook URL is needed — no Bot Token required:
 
-使用 Discord IPC 控制本地 Discord 客户端，需要创建一个 Discord 应用并完成一次 OAuth2 授权：
+1. Discord channel settings → Integrations → Webhooks → New Webhook → Copy URL
+2. Press `G` → Add mapping → Enter Webhook URL → Enable
 
-1. 前往 [Discord Developer Portal](https://discord.com/developers/applications) 创建新应用
-2. 在应用的 **OAuth2** 页面，将 Redirect URL 设为 `http://localhost`，并启用 **RPC** scope
-3. 复制 **Client ID** 和 **Client Secret**
-4. 在游戏中按 `G` → 在顶部两个输入框填入 Client ID 和 Client Secret → 点击**保存应用设置**
-5. 点击**授权 Discord（语音功能必须）** → Discord 客户端弹出授权对话框 → 点击授权
-6. 在映射编辑页面填入目标语音频道 ID，进入对应存档/服务器后即自动加入
+### Voice channel auto-switching
 
-> 授权凭据保存在 `config/discraft/config.json`，仅需配置一次。Discord 需在后台运行。
+Uses Discord IPC to control the local Discord client. Requires a Discord application and one-time OAuth2 authorization:
 
-## 构建
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications) and create a new application
+2. Under **OAuth2**, add `http://localhost` as a redirect URL and enable the **RPC** scope
+3. Copy the **Client ID** and **Client Secret**
+4. In-game: press `G` → fill in Client ID and Client Secret at the top → click **Save App Settings**
+5. Click **Authorize Discord (required for voice)** → approve in the Discord client popup
+6. In each mapping, set the target voice channel ID — it will auto-join on context switch
 
-需要 JDK 17+：
+> Credentials are stored in `config/discraft/config.json` and only need to be set once.
+
+## Building
+
+Requires JDK 17+:
 
 ```bash
+# Fabric
 ./gradlew build
-# 产物：build/libs/discraft-1.0.0.jar
+# Output: build/libs/discraft-1.0.0.jar
+
+# Forge
+cd forge && ./gradlew build
+# Output: forge/build/libs/discraft-forge-1.0.0.jar
 ```
 
-## 项目结构
+## Context Key Format
 
-```
-src/main/java/com/discraft/
-├── DisCraft.java              # 入口点，事件注册，快捷键
-├── bridge/
-│   └── ChatBridgeManager.java # 桥接核心，上下文管理
-├── config/
-│   ├── DisCraftConfig.java    # 配置 POJO，Gson 序列化
-│   └── WorldMapping.java      # 单个频道映射配置
-├── discord/
-│   ├── DiscordIpc.java        # Discord IPC 客户端（语音频道控制）
-│   └── WebhookClient.java     # Discord Webhook HTTP 客户端
-├── gui/
-│   ├── ConfigScreen.java      # 主设置界面
-│   ├── MappingEditScreen.java # 编辑映射
-│   └── AddMappingScreen.java  # 新增映射
-└── mixin/
-    └── ChatScreenMixin.java   # 拦截聊天消息
-```
+| Scenario | Key format | Example |
+|----------|-----------|---------|
+| Singleplayer world | `world:<name>` | `world:My Survival` |
+| Multiplayer server | `server:<ip>` | `server:hypixel.net` |
 
-## 上下文 Key 格式
-
-| 场景 | Key 格式 | 示例 |
-|------|---------|------|
-| 单人存档 | `world:<存档名>` | `world:My Survival` |
-| 多人服务器 | `server:<ip>` | `server:hypixel.net` |
-
-配置文件存储于：`<minecraft>/config/discraft/config.json`
+Config stored at: `<minecraft>/config/discraft/config.json`
 
 ## License
 
@@ -83,4 +75,4 @@ MIT
 
 ## Credits
 
-Embed 通知的颜色方案和 author 格式参考了 [jenchanws/discraft](https://github.com/jenchanws/discraft)（MIT License）。详见 [CREDITS.md](CREDITS.md)。
+Color scheme and author format for Embed notifications adapted from [jenchanws/discraft](https://github.com/jenchanws/discraft) (MIT). See [CREDITS.md](CREDITS.md).
